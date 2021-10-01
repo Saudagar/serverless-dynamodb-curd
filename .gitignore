@@ -1,8 +1,8 @@
 # package directories
 node_modules
 jspm_packages
+ci
 
 # Serverless directories
 .serverless
 
-ci
