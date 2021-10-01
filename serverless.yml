@@ -1,0 +1,62 @@
+service: dynamodb-curd-api
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  lambdaHashingVersion: '20201221'
+  environment:
+    DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}
+
+custom:
+  postsTableName: posts-table-${self:provider.stage}
+
+plugins:
+  - serverless-iam-roles-per-function
+
+resources:
+  Resources:
+    PostsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.postsTableName}
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+functions:
+  getPost:
+    handler: api.getPost
+    name: get-post
+    memorySize: 128 #mb
+    timeout: 5 # sec
+    events:
+      - http:
+          path: post/{postId}
+          method: GET
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:GetItem"
+        Resource: !GetAtt PostsTable.Arn
+  createPost:
+    handler: api.createPost
+    name: create-post
+    memorySize: 128 #mb
+    timeout: 5 # sec
+    events:
+      - http:
+          path: post
+          method: POST
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:PutItem"
+        Resource: !GetAtt PostsTable.Arn
