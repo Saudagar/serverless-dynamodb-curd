@@ -10,9 +10,16 @@ resource_types:
 resources:
 - name: source-code
   type: git
-  source:
+  source: &repo-source
     uri: https://github.com/Saudagar/serverless-dynamodb-curd.git
-    branch: master      
+    branch: master 
+- name: dependency-cache
+  type: npm-cache
+  icon: npm
+  source:
+    <<: *repo-source
+    paths:
+      - package.json     
 
 jobs:
   - name: install
