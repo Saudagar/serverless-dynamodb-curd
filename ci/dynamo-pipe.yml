@@ -25,6 +25,7 @@ jobs:
   - name: install
     plan:
     - get: source-code
+    - get: dependency-cache
       trigger: true
     - task: deploy-to-serverless
       params:
